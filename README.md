@@ -1,66 +1,70 @@
-# Map My Walk
+# Walking Route Planner (working title)
 
-A privacy-first mobile app for planning a walking route **before** you walk, then tracking progress along that route with GPS and haptic feedback.
+A small mobile app for planning a walking route by tapping points on a map, then walking it and seeing your actual GPS trail drawn on the same map.
 
-Most fitness apps only record where you went after the fact. Map My Walk is proactive: draw the path you want, pocket the phone, and walk. No accounts, no social feed, no calorie dashboards — just a lightweight “zen walker” companion.
+> **Status:** Concept / pre-prototype. Nothing is built yet. This README describes the plan; see [`docs/research.md`](docs/research.md) for the evidence behind it and what is still unproven.
 
-## How it works
+## What it does (V1)
 
-1. Open the map and draw a rough path with your finger.
-2. A routing engine map-matches the drawing onto real walkable roads and trails.
-3. Start the walk; the app locks onto your GPS location.
-4. A background service keeps you inside an “invisible tube” (buffer) around the planned route.
-5. If you drift outside the tube, the app sends a haptic alert.
+1. Open the map
+2. Tap points to define your intended route
+3. The app generates a route snapped to walkable roads and trails
+4. Start your walk
+5. The app reads your GPS position
+6. Your actual trail is drawn on the map
+7. Stop the walk
 
-## Goals
+## What V1 deliberately does not do
 
-- Frictionless “zero-tap launch” — open, draw, walk; no login required
-- Purely on-device; privacy-first with no backend for V1
-- Focus on custom route planning and on-route tracking only
+Login, backend, cloud sync, social features, calorie counting, fitness analytics, AI, perfect GPS, GPS smoothing, off-route alerts, turn-by-turn navigation, route history, complex route editing, and offline maps.
 
-## MVP
+Keeping these out is a design choice to keep the first version small. One visible consequence: without GPS smoothing, the drawn trail will show raw GPS noise.
 
-- Interactive map to draw a route
-- Map matching (snap drawing to real paths)
-- Background GPS tracking
-- Off-route haptic alert
-- Local route storage (no accounts / no cloud)
+## Roadmap
 
-**Out of scope for V1:** backend, social features, calorie counters, leaderboards, user accounts.
+| Version | Goal | Contents |
+|---|---|---|
+| V0 | Map experiment | Map renders, user taps points, points are displayed |
+| V1 | Walking prototype | Tap points, generate route, start walk, GPS trail displayed |
+| V1.1 | Route following | Planned route shown, distance from planned route, haptic off-route warning |
+| V2 | Reliability | GPS filtering, background tracking, battery optimization, route saving |
 
-## Tech stack (proposed)
+The roadmap is a plan, not a commitment.
 
-| Area | Choice | Notes |
-|------|--------|--------|
-| Frontend | Flutter or React Native | Cross-platform iOS + Android |
-| Backend | None (local / serverless) | Simple, private, zero host cost |
-| Local storage | SQLite / AsyncStorage / SharedPreferences | Save drawn routes on device |
-| Map renderer | MapLibre GL | Open-source alternative to Google Maps / Mapbox |
-| Routing / map matching | Valhalla or OSRM | Free/public instances for snapping paths |
-| Spatial math | Turf.js (or Dart equivalent) | Distance + buffer / off-route checks |
-| Location | `react-native-geolocation-service` or Flutter `geolocator` | GPS capture |
+## Why this exists, and an honest caveat
 
-AI/ML is not needed for the MVP.
+Apps such as Footpath, TouchTrails and Komoot already let you plan walking routes, and some of their features are paid (for example turn-by-turn navigation and offline maps). Their free tiers already cover a lot of what V1 does, including snapping to paths in Footpath's case. So this project is not claiming an unmet market gap. It is a focused, simple, open-source take on route planning plus trail recording. Details and sources are in [`docs/research.md`](docs/research.md#3-existing-solutions).
 
-## Main technical challenges
+## Privacy
 
-- **Map matching** — Finger strokes are screen coordinates; they must be snapped to legal walking paths so the line doesn’t cut through buildings.
-- **GPS drift / jitter** — Signal bounce under trees or near buildings; needs smoothing so wild jumps don’t break tracking.
-- **Background OS kills** — iOS and Android aggressively kill background GPS; correct permissions and background handlers are critical.
-- **Off-route detection** — Continuously check that the smoothed GPS point stays inside a buffer polygon around the route, allowing for normal GPS error.
+There is no account and no backend of our own. That does not make the app fully offline: your tapped waypoints are sent to a third-party routing service to get a walkable route, and map tiles are fetched from a tile provider, which reveals the area you are viewing. Our design intent is that your recorded GPS trail stays on your device; this needs to be verified once the app exists.
 
-## Competitive landscape
+## Technology (planned)
 
-| App | Gap vs Map My Walk |
-|-----|--------------------|
-| **Footpath Route Planner** | Closest competitor; core turn-by-turn features often behind a premium paywall |
-| **TouchTrails** | Similar draw-and-track utility, but free tier heavily limited (e.g. few saved routes) |
-| **Komoot** | Powerful but complex; account + community features — leaves room for a simpler tool |
+| Area | Choice |
+|---|---|
+| App framework | Flutter or React Native (undecided) |
+| Map rendering | MapLibre |
+| Routing | Valhalla (pedestrian) or OSRM (foot), to be tested |
+| Map tiles | Not yet chosen |
 
-## Next step
+Free public demo routing and tile servers have usage restrictions that may not allow a public release. See [`docs/research.md`](docs/research.md#5-services-and-usage-policies-the-main-v1-risk).
 
-Spin up a basic React Native or Flutter sandbox with MapLibre, send a string of coordinates to a free OSRM or Valhalla instance, and validate map matching on local roads before building the rest of the app.
+## Next steps
 
-## Research
+1. V0 spike: map renders, user taps points, points are displayed.
+2. Test pedestrian routing for tapped waypoints on routes we actually walk.
+3. Walk with raw GPS updates to see how noisy the trail is.
+4. Choose tile and routing providers for release.
 
-Full notes: [project_research_note.md](./project_research_note.md)
+## Open questions
+
+Target platform(s), framework choice, release providers and hosting, intended audience (personal, open-source learning, or public release), and repository licence. See [`docs/research.md`](docs/research.md#9-open-questions).
+
+## Documentation
+
+- [`docs/research.md`](docs/research.md): research notes with sources, claim status labels and a change log
+
+## Licence
+
+To be decided.
