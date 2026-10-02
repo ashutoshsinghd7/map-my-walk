@@ -1,4 +1,4 @@
-# Walking Route Planner (working title)
+# Walking Route Planner (map my walk)
 
 A small mobile app for planning a walking route by tapping points on a map, then walking it and seeing your actual GPS trail drawn on the same map.
 
